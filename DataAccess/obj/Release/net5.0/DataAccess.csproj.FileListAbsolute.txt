@@ -1,0 +1,15 @@
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\bin\Release\net5.0\DataAccess.deps.json
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\bin\Release\net5.0\DataAccess.runtimeconfig.json
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\bin\Release\net5.0\DataAccess.runtimeconfig.dev.json
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\bin\Release\net5.0\DataAccess.dll
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\bin\Release\net5.0\ref\DataAccess.dll
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\bin\Release\net5.0\DataAccess.pdb
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\obj\Release\net5.0\DataAccess.csproj.AssemblyReference.cache
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\obj\Release\net5.0\DataAccess.GeneratedMSBuildEditorConfig.editorconfig
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\obj\Release\net5.0\DataAccess.AssemblyInfoInputs.cache
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\obj\Release\net5.0\DataAccess.AssemblyInfo.cs
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\obj\Release\net5.0\DataAccess.csproj.CoreCompileInputs.cache
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\obj\Release\net5.0\DataAccess.dll
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\obj\Release\net5.0\ref\DataAccess.dll
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\obj\Release\net5.0\DataAccess.pdb
+\\Mac\Home\Documents\GitHub\Portfolio_Server\DataAccess\obj\Release\net5.0\DataAccess.genruntimeconfig.cache

@@ -1,0 +1,32 @@
+﻿<Properties StartupConfiguration="{437B17F4-5BE7-4108-A2F9-13208CF913AC}|Default">
+  <MonoDevelop.Ide.ItemProperties.WASM.V1 PreferredExecutionTarget="/Applications/Safari.app" />
+  <MonoDevelop.Ide.ItemProperties.Portfolio__Server PreferredExecutionTarget="/Applications/Safari.app" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Portfolio_server/appsettings.json">
+    <Files>
+      <File FileName="Portfolio_server/appsettings.json" Line="3" Column="88" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Portfolio" expanded="True">
+            <Node name="DataAccess" expanded="True" />
+            <Node name="Portfilo_Api" expanded="True" />
+            <Node name="Portfolio_Server" expanded="True">
+              <Node name="appsettings.json" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.Portfilo__Api PreferredExecutionTarget="/Applications/Safari.app" />
+</Properties>

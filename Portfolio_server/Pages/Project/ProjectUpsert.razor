@@ -1,0 +1,268 @@
+@page "/project/create"
+@page "/project/edit/{Id:int}"
+@using Models
+@using Business.Repository.IRepository
+@using Microsoft.AspNetCore.Components
+@using Portfolio_Server.Helper
+@using Service.IService
+@inject IProjectRepository ProjectRepository
+@inject IProjectImageRepository ProjectImageRepository
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@inject IFileUpload FileUpload
+
+<div class="m-4">
+    <EditForm Model="ProjectModel" OnValidSubmit="HandleProjectUpsert">
+        <MudCard>
+            <MudCardContent Class="">
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Title" HelperText="Max. 8 characters"
+                                      @bind-Value="ProjectModel.Title" For="@(() => ProjectModel.Title)"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Position" HelperText="Max. 8 characters"
+                                      @bind-Value="ProjectModel.GithubUrl" For="@(() => ProjectModel.GithubUrl)"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Position" HelperText="Max. 8 characters"
+                                      @bind-Value="ProjectModel.ProjectUrl" For="@(() => ProjectModel.ProjectUrl)"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudCheckBox @bind-Checked="@ProjectModel.Featured">@(ProjectModel.Featured == true ? "Featured Project" : "Normal Project")</MudCheckBox>
+                    </MudItem>
+                    <MudItem xs="12" sm="12">
+                        <MudTextField T="string" Label="Short Description" Variant="Variant.Text" @bind-Value="@ProjectModel.ShortDescription" Lines="2"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="12">
+                        <MudTextField T="string" Label="Description" Variant="Variant.Text" @bind-Value="@ProjectModel.Description" Lines="5"/>
+                    </MudItem>
+                    <MudItem Class="d-flex align-center" xs="12" sm="12">
+                        <InputFile id="fileInput" OnChange="HandleImageUpload" hidden multiple/>
+
+                        <MudButton HtmlTag="label"
+                                   Variant="Variant.Outlined"
+                                   Color="Color.Dark"
+                                   StartIcon="@Icons.Filled.CloudUpload"
+                                   for="fileInput">
+                            Upload Files
+                        </MudButton>
+                        @if (FileNumber != 0)
+                        {
+                            <MudText Class="ml-2" Typo="@Typo.body1">@FileNumber Files</MudText>
+                        }
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudGrid>
+                            @if (IsImageUploadProcessStarted)
+                            {
+                                <div class="col-md-12">
+                                    <span class="d-flex align-middle"><MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true"/>Images uploading</span><br>
+                                </div>
+                            }
+                            @if (ProjectModel.ImageUrls != null && ProjectModel.ImageUrls.Count > 0)
+                            {
+                                foreach (var projectImage in ProjectModel.ImageUrls)
+                                {
+                                    <MudItem xs="6" sm="4" md="3" lg="2" xl="2" Class="px-3 py-2">
+
+                                        <div class="aspect-w-3 aspect-h-2">
+                                            <img class="object-cover shadow-lg rounded-lg" src="@projectImage" alt="">
+
+                                        </div>
+                                        <MudButton Style="width: 100%" OnClick="() => DeletePhoto(projectImage)" Class="mt-2" Variant="Variant.Outlined">Delete</MudButton>
+                                    </MudItem>
+                                }
+                            }
+                        </MudGrid>
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+            <MudCardActions Class="d-flex justify-end pr-2">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-2">Save</MudButton>
+                <MudButton ButtonType="ButtonType.Button" Link="project" Variant="Variant.Filled" Color="Color.Error" Class="ml-2">Back to List</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</div>
+
+@code{
+
+    [Parameter]
+    public int? Id { get; set; }
+
+    private ProjectDTO ProjectModel { get; set; } = new ProjectDTO();
+    private ProjectImageDTO ProjectImage { get; set; } = new ProjectImageDTO();
+    private string Title { get; set; } = "Create";
+    private int FileNumber { get; set; } = 0;
+    private List<string> DeleteImageNames { get; set; } = new List<string>();
+    private bool IsImageUploadProcessStarted { get; set; }
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationStae = await AuthenticationState;
+        if (!authenticationStae.User.IsInRole(Common.SD.Role_Admin))
+        {
+            var uri = new Uri(NavigationManager.Uri);
+            NavigationManager.NavigateTo($"/identity/account/login?returnUrl={uri.LocalPath}");
+        }
+        
+        if (Id != null)
+        {
+            Title = "Update";
+            ProjectModel = await ProjectRepository.GetProject(Id.Value);
+            if (ProjectModel?.ProjectImages != null)
+            {
+                ProjectModel.ImageUrls = ProjectModel.ProjectImages.Select(u => u.ProjectImageUrl).ToList();
+            }
+        }
+        else
+        {
+            ProjectModel = new ProjectDTO();
+        }
+    }
+
+    private async Task HandleProjectUpsert()
+    {
+        try
+        {
+            var projectDetailsByTitle = await ProjectRepository.IsProjectUnique(ProjectModel.Title, ProjectModel.Id);
+            if (projectDetailsByTitle != null)
+            {
+                await JsRuntime.ToastrError("Project title already exists.");
+                return;
+            }
+
+            if (ProjectModel.Id != 0 && Title == "Update")
+            {
+                var updateResult =
+                    await ProjectRepository.UpdateProject(ProjectModel.Id, ProjectModel);
+                if (ProjectModel.ImageUrls != null && ProjectModel.ImageUrls.Any()
+                    || (DeleteImageNames != null && DeleteImageNames.Any()))
+                {
+                    foreach (var deletedImageName in DeleteImageNames)
+                    {
+                        var imageName = deletedImageName.Replace($"{NavigationManager.BaseUri}Images/", "");
+                        var result = FileUpload.DeleteFile(imageName);
+                        await ProjectImageRepository.DeletePojectImageByImageUrl(deletedImageName);
+                    }
+
+                    await AddProjectImage(updateResult);
+                }
+                await JsRuntime.ToastrSuccess("Project updated successfully.");
+            }
+            else
+            {
+                var createdResult =
+                    await ProjectRepository.CreateProject(ProjectModel);
+                await AddProjectImage(createdResult);
+                await JsRuntime.ToastrSuccess("Project created successfully.");
+            }
+        }
+        catch (Exception e)
+        {
+            return;
+        }
+
+        NavigationManager.NavigateTo("project");
+    }
+
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        IsImageUploadProcessStarted = true;
+        try
+        {
+            var images = new List<string>();
+            if (e.GetMultipleFiles().Count > 0)
+            {
+                foreach (var file in e.GetMultipleFiles())
+                {
+                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(file.Name);
+                    if (fileInfo.Extension.ToLower() == ".jpg" ||
+                        fileInfo.Extension.ToLower() == ".png" ||
+                        fileInfo.Extension.ToLower() == ".jpeg")
+                    {
+                        var uploadedImagePath = await FileUpload.UploadFile(file);
+                        images.Add(uploadedImagePath);
+                    }
+                    else
+                    {
+                        await JsRuntime.ToastrError("Please select .jpg/ .jpeg/ .png file only");
+                        return;
+                    }
+                }
+
+                if (images.Any())
+                {
+                    if (ProjectModel.ImageUrls != null && ProjectModel.ImageUrls.Any())
+                    {
+                        ProjectModel.ImageUrls.AddRange(images);
+                    }
+                    else
+                    {
+                        ProjectModel.ImageUrls = new List<string>();
+                        ProjectModel.ImageUrls.AddRange(images);
+                    }
+                }
+                else
+                {
+                    await JsRuntime.ToastrError("Image uploading failed");
+                }
+                FileNumber = images.Count;
+            }
+            else
+            {
+                await JsRuntime.ToastrError("Image uploading failed");
+            }
+            IsImageUploadProcessStarted = false;
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.ToastrError(ex.Message);
+        }
+    }
+
+    private async Task AddProjectImage(ProjectDTO projectDetail)
+    {
+        foreach (var imageUrl in ProjectModel.ImageUrls)
+        {
+            if (ProjectModel.ProjectImages == null || ProjectModel.ProjectImages.Where(x => x.ProjectImageUrl == imageUrl).Count() == 0)
+            {
+                ProjectImage = new ProjectImageDTO()
+                {
+                    ProjectId = projectDetail.Id,
+                    ProjectImageUrl = imageUrl
+                };
+
+                await ProjectImageRepository.CreateProjectImage(ProjectImage);
+            }
+        }
+    }
+
+    internal async Task DeletePhoto(string imageUrl)
+    {
+        try
+        {
+            var imageIndex = ProjectModel.ImageUrls.FindIndex(x => x == imageUrl);
+            var imageName = imageUrl.Replace($"{NavigationManager.BaseUri}Images/", "");
+
+            if (ProjectModel.Id == 0 && Title == "Create")
+            {
+                var result = FileUpload.DeleteFile(imageName);
+            }
+            else
+            {
+                DeleteImageNames ??= new List<string>();
+                DeleteImageNames.Add(imageUrl);
+            }
+            ProjectModel.ImageUrls.RemoveAt(imageIndex);
+        }
+        catch (Exception e)
+        {
+            await JsRuntime.ToastrError(e.Message);
+        }
+    }
+
+}

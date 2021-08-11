@@ -1,0 +1,39 @@
+<div id="contact" class="mt-16 m md:mt-0 md:mb-16 my- @COLOR.BG @COLOR.TXT @COLOR.HEADERTEXT ">
+    <Animate Animation="Animations.FadeDown" Duration="TimeSpan.FromSeconds(1)" Delay="TimeSpan.FromSeconds(0.3)" Easing="Easings.EaseInOutBack" Once="true" Mirror="true">
+        <h2 id="aboutHeader" class="text-center ml-5 mb-5 font-bold text-2xl md:text-3xl">
+            Contact Me
+        </h2>
+    </Animate>
+    <Animate Animation="Animations.FadeDown" Duration="TimeSpan.FromSeconds(1)" Delay="TimeSpan.FromSeconds(0.3)" Easing="Easings.EaseInOutBack" Once="true" Mirror="true">
+        <div class="p-8">
+            
+            <form action="#" method="POST" class="py-8 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
+                <div class="sm:col-span-2">
+                    <label for="email" class="block text-sm font-medium @COLOR.TXT">Email</label>
+                    <div class="mt-1">
+                        <input id="email" name="email" type="email" autocomplete="email" class="py-3 px-4 block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md">
+                    </div>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label for="message" class="block text-sm font-medium  @COLOR.TXT">Message</label>
+                    <div class="mt-1">
+                        <textarea id="message" name="message" rows="4" class="py-3 px-4 block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 border border-gray-300 rounded-md"></textarea>
+                    </div>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <button type="submit" class="@COLOR.BUTTON w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white">
+                        Let's talk
+                    </button>
+                </div>
+            </form>
+        </div>
+    </Animate>
+</div>
+
+@code
+{
+    [CascadingParameter(Name = "ColorMode")]
+    public ColorMode COLOR { get; set; }
+}

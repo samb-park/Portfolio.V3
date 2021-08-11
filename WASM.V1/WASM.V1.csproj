@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <NpmLastInstall>node_modules/.last-install</NpmLastInstall>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="Pages\Project\**" />
+      <Content Remove="Pages\Project\**" />
+      <EmbeddedResource Remove="Pages\Project\**" />
+      <None Remove="Pages\Project\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BlazorAnimate" Version="3.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.8" PrivateAssets="all" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\style\app.css" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\images" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Models\Models.csproj" />
+    </ItemGroup>
+
+    <Target Name="CheckForNpm" BeforeTargets="NpmInstall">
+        <Exec Command="npm -v" ContinueOnError="true">
+            <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+        </Exec>
+        <Error Condition="'$(ErrorCode)' != '0'" Text="You must install NPM to build this project" />
+    </Target>
+
+    <Target Name="NpmInstall" BeforeTargets="BuildCSS" Inputs="package.json" Outputs="$(NpmLastInstall)">
+        <Exec Command="npm install" />
+        <Touch Files="$(NpmLastInstall)" AlwaysCreate="true" />
+    </Target>
+
+    <Target Name="BuildCSS" BeforeTargets="Compile">
+        <Exec Command="npm run buildcss:dev" Condition=" '$(Configuration)' == 'Debug' " />
+        <Exec Command="npm run buildcss:release" Condition=" '$(Configuration)' == 'Release' " />
+    </Target>
+</Project>

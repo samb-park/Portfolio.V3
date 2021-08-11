@@ -1,0 +1,21 @@
+﻿@page "/"
+@page "/index"
+
+
+<div id="landing"></div>
+<Landing></Landing>
+<div id="about"></div>
+<About></About>
+<div id="project"></div>
+<ProjectList></ProjectList>
+<div id="experience"></div>
+<WorkExperience></WorkExperience>
+<div id="contact"></div>
+<Contact></Contact>
+
+
+@code
+{
+    [CascadingParameter(Name = "ColorMode")]
+    public ColorMode COLOR { get; set; }
+}

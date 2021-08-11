@@ -1,0 +1,23 @@
+﻿@inherits LayoutComponentBase
+
+<CascadingValue Value="@COLOR" Name="ColorMode">
+    <div class="ml relative @COLOR.BG @COLOR.TXT overflow-hidden">
+        <div class="relative pt-6 pb-16 sm:pb-24">
+            <NavMenu/>
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                @Body
+            </div>
+        </div>
+    </div>
+    <Footer></Footer>
+</CascadingValue>
+
+@code{
+    private ColorMode COLOR { get; set; } = new ColorMode(true);
+
+    protected override async Task OnInitializedAsync()
+    {
+        COLOR = new ColorMode(true);
+    }
+
+}

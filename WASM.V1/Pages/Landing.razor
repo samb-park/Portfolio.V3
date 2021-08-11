@@ -1,0 +1,35 @@
+<div id="landing" class="my-36 md:my-0 text-center md:h-screen flex flex-col justify-center items-center @COLOR.BG @COLOR.TXT">
+    <Animate Animation="Animations.ZoomIn" Anchor="#hero" AnchorPlacement="@Anchor.TopBottom" class="right-pane" DurationMs="2000" Easing="Easings.EaseInOutBack" Once="false" Mirror="true">
+        <p class="font-light block text-xs md:text-sm ">Hi, My name is</p>
+        <h1 class="@COLOR.TXT @COLOR.HTXT transform hover:-translate-y-0.5 tracking-tight font-extrabold mt-3 text-3xl sm:text-5xl md:text-7xl lg:text-7xl xl:text-8xl 2xl:text-8xl">
+            SANGBONG PARK
+        </h1>
+        <p class="text-xs my-1 font-medium block">And</p>
+        <h2 class="@COLOR.TXT @COLOR.HTXT transform hover:-translate-y-0.5  tracking-tight font-extrabold text-2xl sm:text-4xl md:text-6xl lg:text-6xl xl:text-7xl 2xl:text-7xl">
+            Software Engineer
+        </h2>
+
+        <p class="max-w-md mx-auto text-gray-500 mt-5 text-xs md:text-sm">
+            I worked for 7 years as software developer.<br>
+            Currently, I'm focussed on web developer.
+        </p>
+        <div class="mt-5 mx-auto flex justify-center md:mt-8">
+            <div class="rounded-md shadow mr-1 md:mr-4">
+                <a href="#" class="@COLOR.BUTTON w-100 flex items-center justify-center px-6 py-1 text-xs font-medium rounded-md md:py-2 md:text-lg md:px-10">
+                    Resume
+                </a>
+            </div>
+            <div class="rounded-md shadow">
+                <a href="#" class="@COLOR.BUTTON w-100 flex items-center justify-center text-xs font-medium rounded-md md:py-2 px-6 py-1 sm:px-8 sm:py-2 md:text-base md:px-10">
+                    Contact
+                </a>
+            </div>
+        </div>
+    </Animate>
+</div>
+
+@code
+{
+    [CascadingParameter(Name = "ColorMode")]
+    public ColorMode COLOR { get; set; }
+}

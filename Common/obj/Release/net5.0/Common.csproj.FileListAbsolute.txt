@@ -1,0 +1,12 @@
+\\Mac\Home\Documents\GitHub\Portfolio_Server\Common\bin\Release\net5.0\Common.deps.json
+\\Mac\Home\Documents\GitHub\Portfolio_Server\Common\bin\Release\net5.0\Common.dll
+\\Mac\Home\Documents\GitHub\Portfolio_Server\Common\bin\Release\net5.0\ref\Common.dll
+\\Mac\Home\Documents\GitHub\Portfolio_Server\Common\bin\Release\net5.0\Common.pdb
+\\Mac\Home\Documents\GitHub\Portfolio_Server\Common\obj\Release\net5.0\Common.csproj.AssemblyReference.cache
+\\Mac\Home\Documents\GitHub\Portfolio_Server\Common\obj\Release\net5.0\Common.GeneratedMSBuildEditorConfig.editorconfig
+\\Mac\Home\Documents\GitHub\Portfolio_Server\Common\obj\Release\net5.0\Common.AssemblyInfoInputs.cache
+\\Mac\Home\Documents\GitHub\Portfolio_Server\Common\obj\Release\net5.0\Common.AssemblyInfo.cs
+\\Mac\Home\Documents\GitHub\Portfolio_Server\Common\obj\Release\net5.0\Common.csproj.CoreCompileInputs.cache
+\\Mac\Home\Documents\GitHub\Portfolio_Server\Common\obj\Release\net5.0\Common.dll
+\\Mac\Home\Documents\GitHub\Portfolio_Server\Common\obj\Release\net5.0\ref\Common.dll
+\\Mac\Home\Documents\GitHub\Portfolio_Server\Common\obj\Release\net5.0\Common.pdb

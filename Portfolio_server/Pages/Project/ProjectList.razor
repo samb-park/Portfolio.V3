@@ -1,0 +1,106 @@
+@page "/project"
+@using Models
+@using Business.Repository.IRepository
+@using Portfolio_Server.Helper
+@using Portfolio_Server.Service.IService
+@inject IProjectRepository ProjectRepository
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@inject IFileUpload FileUpload
+@attribute [Authorize(Roles = Common.SD.Role_Admin)]
+
+<div class="m-4">
+    <MudGrid>
+        @if (Projects != null)
+        {
+            <MudItem xs="12">
+                <MudTable Items="@Projects" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<ProjectDTO, bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+                    <ToolBarContent>
+                        <MudText Typo="Typo.h6">Project List</MudText>
+                        <MudSpacer/>
+                        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Title</MudTh>
+                        <MudTh>Short Description</MudTh>
+                        <MudTh>Featured</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Title">@context.Title</MudTd>
+                        <MudTd DataLabel="Short Description">@context.ShortDescription</MudTd>
+                        <MudTd DataLabel="Featured">@(context.Featured == true ? "Featured" : "No Featured")</MudTd>
+                    </RowTemplate>
+                    <PagerContent>
+                        <MudTablePager/>
+                    </PagerContent>
+                </MudTable>
+            </MudItem>
+        }
+
+        <MudItem xs="12" Class="d-flex justify-end">
+            <MudButton Link="project/create" Variant="Variant.Outlined" Color="Color.Primary" Class="ml-3">Add</MudButton>
+            @if (selectedItem != null)
+            {
+                <MudButton Link="@($"/project/edit/{selectedItem.Id}")" Variant="Variant.Outlined" Color="Color.Success" Class="ml-3">Edit</MudButton>
+                <MudButton @onclick="() => HandleDelete()" Variant="Variant.Outlined" Color="Color.Error" Class="ml-3">Delete</MudButton>
+            }
+        </MudItem>
+    </MudGrid>
+</div>
+
+<DeleteConfirmation @ref="DeleteConfirm" ConfirmationChanged="ConfirmDelete_Click" IsParentComponentProcessing="IsProcessing"></DeleteConfirmation>
+
+@code{
+    private IEnumerable<ProjectDTO> Projects { get; set; } = new List<ProjectDTO>();
+    private ProjectDTO selectedItem { get; set; }
+    private string searchString = "";
+    private DeleteConfirmation DeleteConfirm { get; set; }
+    private bool IsProcessing { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Projects = await ProjectRepository.GetAllProjects();
+
+        if (Projects == null)
+        {
+            NavigationManager.NavigateTo("/project/create");
+        }
+    }
+
+    private bool FilterFunc(ProjectDTO element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Title.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.ShortDescription.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    
+    private async Task HandleDelete()
+    {
+        DeleteConfirm.Show();
+    }
+
+    public async Task ConfirmDelete_Click(bool isConfirmed)
+    {
+        IsProcessing = true;
+        if (isConfirmed)
+        {
+            ProjectDTO project = await ProjectRepository.GetProject(selectedItem.Id);
+
+            foreach (var image in project.ProjectImages)
+            {
+                var imageName = image.ProjectImageUrl.Replace($"{NavigationManager.BaseUri}Images/", "");
+                FileUpload.DeleteFile(imageName);
+            }
+            
+            await ProjectRepository.DeleteProject(selectedItem.Id);
+            await JsRuntime.ToastrSuccess("Hotel Room Deleted successfully");
+            Projects = await ProjectRepository.GetAllProjects();
+        }
+        IsProcessing = false;
+    }
+
+}

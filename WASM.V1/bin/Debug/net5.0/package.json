@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "buildcss:dev": "postcss ./wwwroot/css/app.css -o ./wwwroot/css/site.css"
+  },
+  "devDependencies": {
+    "cross-env": "latest",
+    "autoprefixer": "latest",
+    "postcss": "latest",
+    "postcss-cli": "latest",
+    "tailwindcss": "latest",
+    "@tailwindcss/forms": "latest",
+    "@tailwindcss/aspect-ratio": "latest"
+  }
+}

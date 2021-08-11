@@ -1,0 +1,107 @@
+@page "/work/create"
+@page "/work/edit/{Id:int}"
+@using Models
+@using Business.Repository.IRepository
+@using Portfolio_Server.Helper
+@inject IWorkRepository WorkRepository
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+
+<div class="m-4">
+    <EditForm Model="WorkModel" OnValidSubmit="HandleWorkUpsert">
+        <MudCard>
+            <MudCardContent Class="">
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Title" HelperText="Max. 8 characters"
+                                      @bind-Value="WorkModel.Title" For="@(() => WorkModel.Title)"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Position" HelperText="Max. 8 characters"
+                                      @bind-Value="WorkModel.Position" For="@(() => WorkModel.Position)"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudDatePicker Label="Start Date" @bind-Date="@WorkModel.StartDate" DisableToolbar="true" HelperText="No header"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudDatePicker Label="Start Date" @bind-Date="@WorkModel.EndDate" DisableToolbar="true" HelperText="No header"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="12">
+                        <MudTextField T="string" Label="Description" Variant="Variant.Text" @bind-Value="@WorkModel.Description" Lines="5"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudCheckBox @bind-Checked="@WorkModel.Current">@(WorkModel.Current == true ? "Current Working" : "Not Working")</MudCheckBox>
+                    </MudItem>Ï
+                </MudGrid>
+
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-2">Save</MudButton>
+                <MudButton ButtonType="ButtonType.Button" Link="work" Variant="Variant.Filled" Color="Color.Primary" Class="ml-2">Back to List</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</div>
+
+@code{
+
+    [Parameter]
+    public int? Id { get; set; }
+    private WorkDTO WorkModel { get; set; } = new WorkDTO();
+    private string Title { get; set; } = "Create";
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthenticationState { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationStae = await AuthenticationState;
+        if (!authenticationStae.User.IsInRole(Common.SD.Role_Admin))
+        {
+            var uri = new Uri(NavigationManager.Uri);
+            NavigationManager.NavigateTo($"/identity/account/login?returnUrl={uri.LocalPath}");
+        }
+        
+        if (Id != null)
+        {
+            Title = "Update";
+            WorkModel = await WorkRepository.GetWork(Id.Value);
+        }
+        else
+        {
+            WorkModel = new WorkDTO();
+        }
+    }
+
+    private async Task HandleWorkUpsert()
+    {
+        try
+        {
+            var workDetailsByTitle = await WorkRepository.IsWorkUnique(WorkModel.Title, WorkModel.Id);
+            if (workDetailsByTitle != null)
+            {
+                await JsRuntime.ToastrError("Work title already exists.");
+                return;
+            }
+
+            if (WorkModel.Id != 0 && Title == "Update")
+            {
+                var updateRoomResult =
+                    await WorkRepository.UpdateWork(WorkModel.Id, WorkModel);
+                await JsRuntime.ToastrSuccess("Working Experience updated successfully.");
+            }
+            else
+            {
+                var createdResult =
+                    await WorkRepository.CreateWork(WorkModel);
+                await JsRuntime.ToastrSuccess("Working Experience created successfully.");
+            }
+        }
+        catch (Exception e)
+        {
+            return;
+        }
+
+        NavigationManager.NavigateTo("work");
+    }
+
+}

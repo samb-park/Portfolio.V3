@@ -1,0 +1,16 @@
+
+<AuthorizeView>
+    <Authorized>
+        Hello, @context.User.Identity.Name
+        <MudLink Class="mx-2" Color="Color.Surface" Style="@($"color:{Colors.Shades.White};")" Href="/Identity/Account/logout">Logout</MudLink>
+    </Authorized>
+    <NotAuthorized>
+            <MudLink Class="mx-2" Color="Color.Surface" Style="@($"color:{Colors.Shades.White};")" Href="/Identity/Account/Register">Register</MudLink>
+            <MudLink Class="mx-2" Color="Color.Surface" Style="@($"color:{Colors.Shades.White};")" Href="/Identity/Account/Login">Login</MudLink>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    
+}

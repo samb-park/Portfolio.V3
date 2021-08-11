@@ -1,0 +1,144 @@
+﻿@page "/aboutme"
+@using Models
+@using Business.Repository.IRepository
+@using Portfolio_Server.Helper
+@using Service.IService
+
+@inject IAboutMeRepository AboutMeRepository
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@inject IFileUpload FileUpload
+
+<div class="m-4">
+    <EditForm Model="AboutMeModel" OnValidSubmit="HandleAboutMeUpSert">
+        <MudCard>
+            <MudCardContent Class="">
+                <MudGrid>
+                    <MudItem xs="12" sm="12">
+                        <MudTextField T="string" Label="Short Description" Variant="Variant.Text" @bind-Value="@AboutMeModel.Descripton" Lines="5" />
+                    </MudItem>
+
+                    <MudItem Class="d-flex align-center" xs="12" sm="12">
+                        <InputFile id="fileInput" OnChange="HandleImageUpload" hidden />
+
+                        <MudButton HtmlTag="label"
+                                   Variant="Variant.Outlined"
+                                   Color="Color.Dark"
+                                   StartIcon="@Icons.Filled.CloudUpload"
+                                   for="fileInput">
+                            Upload Files
+                        </MudButton>
+                        <MudText Class="ml-2" Typo="@Typo.body1">@FileName</MudText>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudGrid>
+                                @*@if (IsImageUploadProcessStarted)
+                                {
+                                    <div class="col-md-12">
+                                        <span class="d-flex align-middle"><MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" />Images uploading</span><br>
+                                    </div>
+                                }*@
+                                @if (AboutMeModel.AboutImageUrl != null)
+                                {
+
+                                        <MudItem xs="6" sm="4" md="3" lg="2" xl="2" Class="px-3 py-2">
+
+                                            <div class="aspect-w-3 aspect-h-2">
+                                                <img class="object-cover shadow-lg rounded-lg" src="@AboutMeModel.AboutImageUrl" alt="">
+
+                                            </div>
+                                            @*<MudButton Style="width: 100%" OnClick="() => DeletePhoto(projectImage)" Class="mt-2" Variant="Variant.Outlined">Delete</MudButton>*@
+                                        </MudItem>
+
+                                }
+                            </MudGrid>
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+            <MudCardActions Class="d-flex justify-end pr-2">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-2">Save</MudButton>
+                <MudButton ButtonType="ButtonType.Button" Link="project" Variant="Variant.Filled" Color="Color.Error" Class="ml-2">Back to List</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</div>
+
+@code {
+    public AboutMeDTO AboutMeModel { get; set; } = new AboutMeDTO();
+    public string FileName { get; set; } = "None";
+
+    protected async override Task OnInitializedAsync()
+    {
+
+        AboutMeModel = await AboutMeRepository.GetAboutMe();
+
+        if (AboutMeModel == null)
+        {
+            AboutMeModel = new AboutMeDTO();
+        }
+
+    }
+
+    private async Task HandleAboutMeUpSert()
+    {
+        try
+        {
+            if (AboutMeModel.Id != 0)
+            {
+                var updateResult =
+                    await AboutMeRepository.UpdateAboutMe(AboutMeModel.Id, AboutMeModel);
+
+                await JsRuntime.ToastrSuccess("Project updated successfully.");
+            }
+            else
+            {
+                var createdResult =
+                    await AboutMeRepository.CreateAboutMe(AboutMeModel);
+
+                await JsRuntime.ToastrSuccess("Project created successfully.");
+            }
+        }
+        catch (Exception e)
+        {
+            return;
+        }
+    }
+
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+
+        try
+        {
+            var images = "";
+            if (e.GetMultipleFiles().Count > 0)
+            {
+                var file = e.File;
+
+                System.IO.FileInfo fileInfo = new System.IO.FileInfo(file.Name);
+                if (fileInfo.Extension.ToLower() == ".jpg" ||
+                    fileInfo.Extension.ToLower() == ".png" ||
+                    fileInfo.Extension.ToLower() == ".jpeg")
+                {
+                    var uploadedImagePath = await FileUpload.UploadFile(file);
+                    AboutMeModel.AboutImageUrl = uploadedImagePath;
+                }
+                else
+                {
+                    await JsRuntime.ToastrError("Please select .jpg/ .jpeg/ .png file only");
+                    return;
+                }
+
+                FileName = file.Name;
+            }
+            else
+            {
+                await JsRuntime.ToastrError("Image uploading failed");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.ToastrError(ex.Message);
+        }
+    }
+
+}

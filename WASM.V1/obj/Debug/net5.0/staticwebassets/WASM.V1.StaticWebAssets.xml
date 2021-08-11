@@ -1,0 +1,5 @@
+﻿<StaticWebAssets Version="1.0">
+  <ContentRoot BasePath="_content/BlazorAnimate" Path="/Users/sangbongpark/.nuget/packages/blazoranimate/3.0.0/build/../staticwebassets/" />
+  <ContentRoot BasePath="/" Path="/Users/sangbongpark/Documents/GitHub/Portfolio_Server/WASM.V1/bin/Debug/net5.0/wwwroot/" />
+  <ContentRoot BasePath="/" Path="/Users/sangbongpark/Documents/GitHub/Portfolio_Server/WASM.V1/obj/Debug/net5.0/scopedcss/bundle/" />
+</StaticWebAssets>
